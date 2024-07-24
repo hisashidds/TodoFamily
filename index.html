@@ -1,154 +1,113 @@
 <!DOCTYPE html>
-<html lang="ja" :class="{ 'dark-mode': isDarkMode }">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        html, body {
-            min-height: 100vh;
+        body.dark-mode {
+            background-color: #222;
+            color: #fff;
         }
-        body { 
-            font-size: 28px; 
+        .dark-mode .box {
+            background-color: #333;
+            color: #fff;
         }
-        .input, .button { font-size: 24px; height: 2em; }
-        .todo-item { 
-            font-size: 28px; 
-            padding: 0.3em; 
-            margin-bottom: 0.3em; 
+        .dark-mode .button {
+            background-color: #444;
+            color: #fff;
         }
-        .checkbox { 
-            width: 1.2em; 
-            height: 1.2em; 
-            margin-right: 0.5em;
+        .dark-mode .input {
+            background-color: #444;
+            color: #fff;
+        }
+        .dark-mode .input::placeholder {
+            color: #aaa;
+        }
+        .dark-mode .select select {
+            background-color: #444;
+            color: #fff;
+        }
+        .dark-mode .title {
+            color: #fff;
+        }
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            transition: left 0.3s ease-in-out;
+        }
+        .dark-mode .sidebar {
+            background-color: #333;
+        }
+        .sidebar.is-active {
+            left: 0;
+        }
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        .main-content.sidebar-active {
+            margin-left: 250px;
+        }
+        .completed {
+            text-decoration: line-through;
+        }
+        .todo-item input[type="checkbox"] {
             transform: scale(2.5);
-        }
-        .completed { text-decoration: line-through; color: #888; }
-        .list-title { font-size: 36px; margin-bottom: 0.3em; }
-        .edit-title-input { font-size: 32px; height: 1.5em; padding: 0.2em; }
-        .delete-button { 
-            font-size: 18px; 
-            padding: 0 0.5em; 
-            height: 1.5em; 
-        }
-        .uncheck-all-button {
-            font-size: 18px;
-            padding: 0 0.5em;
-            height: 2em;
+            margin-right: 10px;
         }
         .list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.3em;
+            margin-bottom: 10px;
         }
         .new-todo-input {
             flex-grow: 1;
-            margin-right: 0.5em;
-        }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 300px;
-            height: 100vh;
-            transition: left 0.3s ease-in-out;
-            z-index: 1000;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            font-size: 16px;
-        }
-        .sidebar.is-active {
-            left: 0;
-        }
-        .sidebar-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-        }
-        .main-content {
-            transition: margin-left 0.3s ease-in-out;
-            padding-left: 80px;
-            min-height: 100vh;
-        }
-        .main-content.sidebar-active {
-            margin-left: 300px;
-        }
-        .column-select {
-            margin-top: 20px;
-        }
-        .column-select select {
-            width: 100%;
-            font-size: 16px;
-            height: 2em;
-        }
-        .dark-mode-toggle {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .dark-mode-toggle input[type="checkbox"] {
-            margin-right: 8px;
-        }
-        /* Dark mode styles */
-        .dark-mode {
-            background-color: #333;
-            color: #f5f5f5;
-        }
-        .dark-mode .sidebar {
-            background-color: #222;
-            color: #f5f5f5;
-        }
-        .dark-mode .todo-item {
-            background-color: #444;
-            color: #f5f5f5;
-        }
-        .dark-mode .input {
-            background-color: #555;
-            color: #f5f5f5;
-        }
-        .dark-mode .button {
-            background-color: #666;
-            color: #f5f5f5;
-        }
-        .dark-mode .completed {
-            color: #aaa;
-        }
-        .dark-mode .box {
-            background-color: #444;
-            color: #f5f5f5;
-        }
-        .dark-mode .select select {
-            background-color: #555;
-            color: #f5f5f5;
+            margin-right: 10px;
         }
         .dark-mode .section {
-            background-color: #333;
+            background-color: #222;
+        }
+        body.dark-mode {
+            min-height: 100vh;
+        }
+        .dark-mode .column {
+            background-color: #222;
+        }
+        .dark-mode .section {
+            background-color: #222;
+            min-height: 100vh;
         }
     </style>
 </head>
 <body>
-    <div id="app" :class="{ 'dark-mode': isDarkMode }">
-        <button @click="toggleSidebar" class="button is-primary sidebar-toggle">
+    <div id="app">
+        <button @click="isSidebarActive = !isSidebarActive" class="button is-primary is-large" style="position: fixed; top: 10px; left: 10px; z-index: 1000;">
             ☰
         </button>
 
         <div class="sidebar" :class="{ 'is-active': isSidebarActive }">
             <h2 class="title is-4">設定</h2>
             <div class="column-select">
-                <label class="label">段組み数:</label>
                 <div class="select">
-                    <select v-model="columnCount" @change="adjustVisibility">
+                    <select v-model="columnCount">
                         <option v-for="n in 4" :key="n" :value="n">{{ n }}段組み</option>
                     </select>
                 </div>
             </div>
             <div class="dark-mode-toggle">
-                <input type="checkbox" id="darkModeToggle" v-model="isDarkMode">
-                <label for="darkModeToggle">ダークモード</label>
+                <label class="checkbox">
+                    <input type="checkbox" v-model="isDarkMode">
+                    ダークモード
+                </label>
             </div>
         </div>
 
@@ -158,38 +117,31 @@
                     <div class="columns">
                         <div v-for="(list, listIndex) in todoLists" :key="list.id" :class="'column is-' + (12 / columnCount)" v-show="listIndex < columnCount">
                             <div class="list-title" @dblclick="startEditingTitle(listIndex)">
-                                <span v-if="!list.editingTitle">{{ list.title }}</span>
-                                <input
-                                    v-else
-                                    v-model="list.title"
-                                    @blur="finishEditingTitle(listIndex)"
-                                    @keyup.enter="finishEditingTitle(listIndex)"
-                                    class="input edit-title-input"
-                                    type="text"
-                                >
+                                <h2 class="title is-4" v-if="!list.editingTitle">{{ list.title }}</h2>
+                                <input v-else v-model="list.title" @blur="finishEditingTitle(listIndex)" @keyup.enter="finishEditingTitle(listIndex)" class="input">
                             </div>
                             <div class="list-header">
                                 <div class="field has-addons new-todo-input">
                                     <div class="control is-expanded">
-                                        <input class="input" type="text" v-model="list.newTodo" @keyup.enter="addTodo(listIndex)" placeholder="新しいタスク">
+                                        <input class="input" type="text" v-model="list.newTodo" @keyup.enter="addTodo(list)" placeholder="新しいタスクを入力">
                                     </div>
                                     <div class="control">
-                                        <button class="button is-primary" @click="addTodo(listIndex)">追加</button>
+                                        <button class="button is-primary" @click="addTodo(list)">追加</button>
                                     </div>
                                 </div>
-                                <button class="button is-info is-light uncheck-all-button" @click="uncheckAll(listIndex)">全解除</button>
+                                <button class="button is-small" @click="uncheckAll(list)">全解除</button>
                             </div>
                             <div class="mt-4">
-                                <div v-for="todo in sortedTodos(list.todos)" :key="todo.id" class="todo-item box">
+                                <div class="todo-item box" v-for="todo in sortedTodos(list.todos)" :key="todo.id">
                                     <div class="columns is-vcentered is-mobile">
                                         <div class="column is-narrow">
-                                            <input type="checkbox" class="checkbox" v-model="todo.completed">
+                                            <input type="checkbox" v-model="todo.completed">
                                         </div>
                                         <div class="column" :class="{ 'completed': todo.completed }">
                                             {{ todo.text }}
                                         </div>
                                         <div class="column is-narrow">
-                                            <button class="button is-danger is-small delete-button" @click="removeTodo(listIndex, todo.id)">×</button>
+                                            <button class="delete" @click="removeTodo(list, todo)"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -202,77 +154,116 @@
     </div>
 
     <script>
-        new Vue({
-            el: '#app',
-            data: {
-                columnCount: 1,
-                todoLists: [],
-                nextTodoId: 1,
-                nextListId: 1,
-                isSidebarActive: false,
-                isDarkMode: false
-            },
-            methods: {
-                toggleSidebar() {
-                    this.isSidebarActive = !this.isSidebarActive;
-                },
-                adjustVisibility() {
-                    while (this.todoLists.length < this.columnCount) {
-                        this.todoLists.push({
-                            id: this.nextListId++,
-                            title: `リスト ${this.todoLists.length + 1}`,
-                            editingTitle: false,
-                            newTodo: '',
-                            todos: []
-                        });
-                    }
-                },
-                addTodo(listIndex) {
-                    const list = this.todoLists[listIndex];
-                    if (list.newTodo.trim().length > 0) {
-                        list.todos.push({ 
-                            id: this.nextTodoId++,
+        const { createApp, ref, watch, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const todoLists = ref([]);
+                const columnCount = ref(2);
+                const isDarkMode = ref(false);
+                const isSidebarActive = ref(false);
+
+                const addTodo = (list) => {
+                    if (list.newTodo.trim()) {
+                        list.todos.push({
+                            id: Date.now(),
                             text: list.newTodo.trim(),
                             completed: false
                         });
                         list.newTodo = '';
                     }
-                },
-                removeTodo(listIndex, todoId) {
-                    const list = this.todoLists[listIndex];
-                    const index = list.todos.findIndex(todo => todo.id === todoId);
+                };
+
+                const removeTodo = (list, todo) => {
+                    const index = list.todos.indexOf(todo);
                     if (index !== -1) {
                         list.todos.splice(index, 1);
                     }
-                },
-                startEditingTitle(listIndex) {
-                    this.todoLists[listIndex].editingTitle = true;
-                    this.$nextTick(() => {
-                        this.$el.querySelector('.edit-title-input').focus();
-                    });
-                },
-                finishEditingTitle(listIndex) {
-                    this.todoLists[listIndex].editingTitle = false;
-                    if (this.todoLists[listIndex].title.trim() === '') {
-                        this.todoLists[listIndex].title = `リスト ${listIndex + 1}`;
-                    }
-                },
-                sortedTodos(todos) {
+                };
+
+                const uncheckAll = (list) => {
+                    list.todos.forEach(todo => todo.completed = false);
+                };
+
+                const sortedTodos = (todos) => {
                     return [...todos].sort((a, b) => {
                         if (a.completed === b.completed) return 0;
                         return a.completed ? 1 : -1;
                     });
-                },
-                uncheckAll(listIndex) {
-                    this.todoLists[listIndex].todos.forEach(todo => {
-                        todo.completed = false;
-                    });
-                }
-            },
-            created() {
-                this.adjustVisibility();
+                };
+
+                const startEditingTitle = (listIndex) => {
+                    todoLists.value[listIndex].editingTitle = true;
+                };
+
+                const finishEditingTitle = (listIndex) => {
+                    todoLists.value[listIndex].editingTitle = false;
+                };
+
+                const saveToLocalStorage = () => {
+                    localStorage.setItem('todoLists', JSON.stringify(todoLists.value));
+                    localStorage.setItem('columnCount', columnCount.value);
+                    localStorage.setItem('isDarkMode', isDarkMode.value);
+                };
+
+                const loadFromLocalStorage = () => {
+                    const savedTodoLists = localStorage.getItem('todoLists');
+                    if (savedTodoLists) {
+                        todoLists.value = JSON.parse(savedTodoLists);
+                    } else {
+                        // 初期データ
+                        todoLists.value = [
+                            { id: 1, title: 'リスト1', todos: [], newTodo: '' },
+                            { id: 2, title: 'リスト2', todos: [], newTodo: '' },
+                            { id: 3, title: 'リスト3', todos: [], newTodo: '' },
+                            { id: 4, title: 'リスト4', todos: [], newTodo: '' },
+                        ];
+                    }
+
+                    const savedColumnCount = localStorage.getItem('columnCount');
+                    if (savedColumnCount) {
+                        columnCount.value = parseInt(savedColumnCount);
+                    }
+
+                    const savedIsDarkMode = localStorage.getItem('isDarkMode');
+                    if (savedIsDarkMode) {
+                        isDarkMode.value = JSON.parse(savedIsDarkMode);
+                    }
+                };
+
+                watch([todoLists, columnCount, isDarkMode], () => {
+                    saveToLocalStorage();
+                }, { deep: true });
+
+                watch(isDarkMode, (newValue) => {
+                    if (newValue) {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                });
+
+                onMounted(() => {
+                    loadFromLocalStorage();
+                    if (isDarkMode.value) {
+                        document.body.classList.add('dark-mode');
+                    }
+                });
+
+                return {
+                    todoLists,
+                    columnCount,
+                    isDarkMode,
+                    isSidebarActive,
+                    addTodo,
+                    removeTodo,
+                    uncheckAll,
+                    sortedTodos,
+                    startEditingTitle,
+                    finishEditingTitle
+                };
             }
-        });
+        }).mount('#app');
     </script>
 </body>
 </html>
